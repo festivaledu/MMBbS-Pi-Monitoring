@@ -37,7 +37,7 @@
 
 			<div class="text-end">
 				<span class="d-block text-muted mb-0">Humidity</span>
-				<span class="d-block fs-4 fw-semibold mb-0">{{ currentEntry?.humidity || "––" }}%</span>
+				<span class="d-block fs-4 fw-semibold mb-0">{{ currentEntry?.humidity.toFixed(2) || "––" }}%</span>
 			</div>
 		</div>
 	</div>
