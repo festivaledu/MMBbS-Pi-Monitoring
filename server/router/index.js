@@ -29,28 +29,19 @@ router.post("/nodes/register", async (req, res) => {
 
 		let [ nodeObj, created ] = await Node.findOrCreate({
 			where: {
-				[Sequelize.Op.or]: {
-					eth0_mac: req.body["eth0_mac"],
-					wlan0_mac: req.body["wlan0_mac"]
-				}
+				id: req.body["id"]
 			},
 			defaults: {
-				id: uuid(),
+				id: req.body["id"],
 				hostname: req.body["hostname"],
-				eth0_mac: req.body["eth0_mac"],
-				eth0_ipv4: req.body["eth0_ipv4"],
-				wlan0_mac: req.body["wlan0_mac"],
-				wlan0_ipv4: req.body["wlan0_ipv4"],
+				interfaces: req.body["interfaces"]
 			}
 		});
 
 		if (!created) {
 			nodeObj.update({
 				hostname: req.body["hostname"],
-				eth0_mac: req.body["eth0_mac"],
-				eth0_ipv4: req.body["eth0_ipv4"],
-				wlan0_mac: req.body["wlan0_mac"],
-				wlan0_ipv4: req.body["wlan0_ipv4"],
+				interfaces: req.body["interfaces"]
 			});
 		}
 

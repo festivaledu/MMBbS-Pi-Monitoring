@@ -2,6 +2,8 @@ const axios = require("axios"),
 	  dht = require("node-dht-sensor"),
 	  dotenv = require("dotenv"),
 	  ds18x20 = require("ds18x20"),
+	  os = require("os"),
+	{ machineId } = require("node-machine-id");
 
 const { expand: dotenvExpand } = require("dotenv-expand");
 dotenvExpand(dotenv.config({ path: `${process.cwd()}/.env` }));
@@ -20,19 +22,21 @@ if (+process.env["USE_DHT_SENSOR"]) {
 }
 
 (async () => {
-	let interfaces = os.networkInterfaces();
-	let wlan0 = interfaces["en0"].find(_ => _.family == "IPv4");
-	let eth0 = interfaces["en5"].find(_ => _.family == "IPv4");
+	let nodeId = await machineId({ original: true});
+	let interfaces = Object.entries(os.networkInterfaces()).reduce((list, [interfaceName, interfaceData]) => {
+		if (interfaceData.some(_ => _.internal)) return list;
 
-	let nodeObj = await axios.post(`${process.env.MONITOR_URL}/api/v1/nodes/register`, {
+		list[interfaceName] = interfaceData.find(_ => _.family === "IPv4");
+
+		return list;
+	}, {});
+
+	await axios.post(`${process.env.MONITOR_URL}/api/v1/nodes/register`, {
+		id: nodeId,
 		hostname: os.hostname(),
-		eth0_mac: eth0.mac,
-		eth0_ipv4: eth0.address,
-		wlan0_mac: wlan0.mac,
-		wlan0_ipv4: wlan0.address,
+		interfaces
 	}).then(response => response.data);
 
-	const nodeId = nodeObj.id;
 
 	let pushToServer = async () => {
 		let temperature = 0.0,
@@ -46,7 +50,7 @@ if (+process.env["USE_DHT_SENSOR"]) {
 		} else {
 			temperature = ds18x20.get(sensor);
 			humidity = 0;
-	}
+		}
 
 		await axios.post(`${process.env.MONITOR_URL}/api/v1/sensors/publish?node.id=${nodeId}`, {
 			temperature,
