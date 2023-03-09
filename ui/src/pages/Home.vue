@@ -23,7 +23,7 @@ export default {
 		}
 	},
 	async mounted() {
-		let serverUrl = "localhost:3000";
+		let serverUrl = `${location.hostname}:3000`;
 
 		let urlParams = new URLSearchParams(location.search);
 		if (urlParams.has("server")) {
