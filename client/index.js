@@ -1,10 +1,23 @@
 const axios = require("axios"),
+	  dht = require("node-dht-sensor"),
 	  dotenv = require("dotenv"),
-	  gpio = require("onoff"),
-	  os = require("os");
+	  ds18x20 = require("ds18x20"),
 
 const { expand: dotenvExpand } = require("dotenv-expand");
 dotenvExpand(dotenv.config({ path: `${process.cwd()}/.env` }));
+
+let sensor = null;
+
+if (+process.env["USE_DHT_SENSOR"]) {
+	console.log(`Using sensor of type DHT${process.env["DHT_TYPE"]}.`);
+} else {
+	if (!ds18x20.isDriverLoaded()) {
+		throw new Error("w1 driver is not loaded (modprobe w1-therm/w1-gpio)");
+	}
+
+	console.log(`Using sensor of type DS18x20.`);
+	sensor = ds18x20.list()[0];
+}
 
 (async () => {
 	let interfaces = os.networkInterfaces();
@@ -21,14 +34,23 @@ dotenvExpand(dotenv.config({ path: `${process.cwd()}/.env` }));
 
 	const nodeId = nodeObj.id;
 
-	const getRandomFloat = (min, max, decimals = 2) => {
-		return parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
+	let pushToServer = async () => {
+		let temperature = 0.0,
+			humidity = 0.0;
+
+		if (+process.env["USE_DHT_SENSOR"]) {
+			let sensor = await dht.read(+process.env["DHT_TYPE"], +process.env["DHT_GPIO"]);
+
+			temperature = sensor.temperature;
+			humidity = sensor.humidity;
+		} else {
+			temperature = ds18x20.get(sensor);
+			humidity = 0;
 	}
 
-	let pushToServer = async () => {
 		await axios.post(`${process.env.MONITOR_URL}/api/v1/sensors/publish?node.id=${nodeId}`, {
-			temperature: getRandomFloat(20, 30),
-			humidity: getRandomFloat(50, 85)
+			temperature,
+			humidity
 		});
 	}
 
