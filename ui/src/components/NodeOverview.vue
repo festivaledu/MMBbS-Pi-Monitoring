@@ -11,18 +11,20 @@
 		<div class="collapse" :id="`collapse-node-${node.id}`">
 			<div class="card card-body flex-row">
 				<div class="col-12 col-sm-4">
+					<p class="fw-bold fs-4 mb-1">Device Info</p>
 					<p class="fw-bold mb-0">Hostname</p>
 					<pre>{{ node.hostname }}</pre>
 				</div>
-				<div class="col-12 col-sm-4">
-					<p class="fw-bold mb-0">Ethernet (eth0)</p>
-					<p class="mb-0">IPv4: <span class="font-monospace">{{ node.eth0_ipv4 || "unknown" }}</span></p>
-					<p class="mb-0">MAC Address: <span class="font-monospace">{{ node.eth0_mac || "unknown" }}</span></p>
-				</div>
-				<div class="col-12 col-sm-4">
-					<p class="fw-bold mb-0">Wi-Fi (wlan0)</p>
-					<p class="mb-0">IPv4: <span class="font-monospace">{{ node.wlan0_ipv4 || "unknown" }}</span></p>
-					<p class="mb-0">MAC Address: <span class="font-monospace">{{ node.wlan0_mac || "unknown" }}</span></p>
+
+				<div class="col-12 col-sm-8">
+					<p class="fw-bold fs-4 mb-1">Interface Overview</p>
+
+					<div class="col-6 col-sm-12" v-for="([ifaceId, iface],b,c) in Object.entries(node.interfaces)" :id="ifaceId">
+						<p class="fw-bold mb-0">{{ ifaceId }} ({{ iface.family }})</p>
+						<p class="mb-0">IPv4: <span class="font-monospace">{{ iface.address || "unknown" }}</span></p>
+						<p class="mb-0">Netmask: <span class="font-monospace">{{ iface.netmask || "unknown" }}</span></p>
+						<p class="mb-0">MAC Address: <span class="font-monospace">{{ iface.mac || "unknown" }}</span></p>
+					</div>
 				</div>
 			</div>
 		</div>
