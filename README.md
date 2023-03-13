@@ -33,7 +33,32 @@ Options can be set by editing `server/.env`.
 
 ## Client
 
-The client is intended to be run on a Raspberry Pi with a connected temperature/humidity sensor, but for right now, it's pushing random data to the server so you can run it on any device you like.
+The client supports both DS18x20 (temperature only) and DHTxx (temperature + humidity) sensors. To force the usage of a DHT type sensor, set `USE_DHT_SENSOR` in `.env` to `1`, alongside the type of DHT sensor you're using (`DHT_TYPE`, both `11` and `22` supported) and the GPIO pin the sensor is connected to (`DHT_GPIO`).
+
+If you're using a DS18x20 type sensor, you need to make sure the driver and kernel modules are loaded correctly.  
+On a Raspberry Pi, add the following lines to `/boot/config.txt`:
+
+```
+dtoverlay=w1-gpio,gpiopin=4
+dtoverlay=w1-therm
+```
+
+**Note:** Replace `gpiopin=4` with the GPIO pin the sensor is connected to.
+
+Additionally, add the following lines too `/etc/modules`:
+
+```
+w1_therm
+w1_gpio
+```
+
+Finally, add these lines to `/etc/rc.local` before the final `exit 0` to enable the internal pull-up resistor on the correct port. Again, replace the `4` with the port your sensor is connected to.
+
+```
+raspi-gpio set 4 ip pu
+```
+
+Reboot your device, and you should be seeing a device under `/sys/bus/w1/devices` that is NOT `w1_bus_master1` and where the identifier is NOT mostly zeroes.
 
 To start the client, run the following commands:
 
