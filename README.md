@@ -91,9 +91,8 @@ Options can be set by editing `client/.env`.
 
 The Web UI is used to display historical data of each known monitor node. Temperature can be displayed in Celsius, Fahrenheit, Kelvin, or even historical units such as Rankine and Réaumur.
 
-Currently, the Web UI is independent of the main server and as such needs to be started seperately. Once Web UI development has finished, the main server will also serve the Web UI.
-
-To start the client, run the following commands:
+Usually, the server provides access to the Web UI. In case you want to make changes to it, you can start the Web UI independently from the server.  
+To start the Web UI, run the following commands:
 
 ```sh
 $ cd ui
@@ -102,7 +101,10 @@ $ cd ui
 $ npm install
 
 $ npm run dev
+
+# Build Web UI to be served statically (optional)
+$ npm run build
 ```
 
 After starting, the Web UI can be reached under `http://localhost:8080`.  
-By default, it will connect to `http://localhost:3000` to display data. This can be overriden by specifying the `server` GET parameter (eg. `https://localhost:8080?server=10.3.3.7:42069`).
+By default, it will connect to `http://{hostname}:3000` to display data. This can be overriden by specifying the `server` GET parameter (eg. `https://localhost:8080?server=10.3.3.7:42069`).

@@ -65,6 +65,7 @@ expressApp.use(express.json());
 expressApp.use(cookieParser());
 expressApp.use(cors());
 
+expressApp.use(express.static('../ui/dist'));
 expressApp.use("/api/v1", require("./router"));
 
 let listener = expressApp.listen(+process.env["SERVER_PORT"] || 3000, () => {
