@@ -19,7 +19,8 @@
 				<div class="col-12 col-sm-8">
 					<p class="fw-bold fs-4 mb-1">Interface Overview</p>
 
-					<div class="col-6 col-sm-12" v-for="([ifaceId, iface],b,c) in Object.entries(node.interfaces)" :id="ifaceId">
+					<div class="row g-3 w-100">
+						<div class="col-12 col-sm-6" v-for="([ifaceId, iface],b,c) in Object.entries(node.interfaces)" :id="ifaceId">
 						<p class="fw-bold mb-0">{{ ifaceId }} ({{ iface.family }})</p>
 						<p class="mb-0">IPv4: <span class="font-monospace">{{ iface.address || "unknown" }}</span></p>
 						<p class="mb-0">Netmask: <span class="font-monospace">{{ iface.netmask || "unknown" }}</span></p>
@@ -27,6 +28,7 @@
 					</div>
 				</div>
 			</div>
+		</div>
 		</div>
 
 		<LineChart ref="chart" class="mb-3" :chartData="chartData" :options="chartOptions" :height="250" />
