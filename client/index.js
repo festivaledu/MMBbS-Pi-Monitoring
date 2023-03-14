@@ -39,8 +39,8 @@ if (+process.env["USE_DHT_SENSOR"]) {
 
 
 	let pushToServer = async () => {
-		let temperature = 0.0,
-			humidity = 0.0;
+		let temperature = null,
+			humidity = null;
 
 		if (+process.env["USE_DHT_SENSOR"]) {
 			let sensor = await dht.read(+process.env["DHT_TYPE"], +process.env["DHT_GPIO"]);
@@ -49,7 +49,6 @@ if (+process.env["USE_DHT_SENSOR"]) {
 			humidity = sensor.humidity;
 		} else {
 			temperature = ds18x20.get(sensor);
-			humidity = 0;
 		}
 
 		await axios.post(`${process.env.MONITOR_URL}/api/v1/sensors/publish?node.id=${nodeId}`, {

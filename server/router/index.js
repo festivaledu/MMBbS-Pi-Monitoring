@@ -61,7 +61,7 @@ router.get("/sensors", async (req, res) => {
 	const { Node, TemperatureEntry } = global.models;
 
 	if (req.query.node) {
-		let query = (req.query.node || {}).filter(["id", "hostname", "eth0_mac", "eth0_ipv4", "wlan0_mac", "wlan0_ipv4"]);
+		let query = (req.query.node || {}).filter(["id", "hostname"]);
 		if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).json({
 			error: {
 				name: httpStatus[httpStatus.BAD_REQUEST],
@@ -103,7 +103,7 @@ router.post("/sensors/publish", async (req, res) => {
 	try {
 		const { Node, TemperatureEntry } = global.models;
 
-		let query = (req.query.node || {}).filter(["id", "hostname", "eth0_mac", "eth0_ipv4", "wlan0_mac", "wlan0_ipv4"]);
+		let query = (req.query.node || {}).filter(["id", "hostname"]);
 		if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).json({
 			error: {
 				name: httpStatus[httpStatus.BAD_REQUEST],
@@ -113,13 +113,13 @@ router.post("/sensors/publish", async (req, res) => {
 		});
 
 		let { temperature, humidity } = req.body;
-		if (temperature == null || humidity == null) return res.status(httpStatus.BAD_REQUEST).json({
-			error: {
-				name: httpStatus[httpStatus.BAD_REQUEST],
-				code: httpStatus.BAD_REQUEST,
-				message: "Missing entry details"
-			}
-		});
+		// if (temperature == null || humidity == null) return res.status(httpStatus.BAD_REQUEST).json({
+		// 	error: {
+		// 		name: httpStatus[httpStatus.BAD_REQUEST],
+		// 		code: httpStatus.BAD_REQUEST,
+		// 		message: "Missing entry details"
+		// 	}
+		// });
 
 		let nodeObj = await Node.findOne({
 			where: {
