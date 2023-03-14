@@ -21,14 +21,14 @@
 
 					<div class="row g-3 w-100">
 						<div class="col-12 col-sm-6" v-for="([ifaceId, iface],b,c) in Object.entries(node.interfaces)" :id="ifaceId">
-						<p class="fw-bold mb-0">{{ ifaceId }} ({{ iface.family }})</p>
-						<p class="mb-0">IPv4: <span class="font-monospace">{{ iface.address || "unknown" }}</span></p>
-						<p class="mb-0">Netmask: <span class="font-monospace">{{ iface.netmask || "unknown" }}</span></p>
-						<p class="mb-0">MAC Address: <span class="font-monospace">{{ iface.mac || "unknown" }}</span></p>
+							<p class="fw-bold mb-0">{{ ifaceId }} ({{ iface.family }})</p>
+							<p class="mb-0">IPv4: <span class="font-monospace">{{ iface.address || "unknown" }}</span></p>
+							<p class="mb-0">Netmask: <span class="font-monospace">{{ iface.netmask || "unknown" }}</span></p>
+							<p class="mb-0">MAC Address: <span class="font-monospace">{{ iface.mac || "unknown" }}</span></p>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 		</div>
 
 		<LineChart ref="chart" class="mb-3" :chartData="chartData" :options="chartOptions" :height="250" />
@@ -61,9 +61,12 @@ export default {
 	inject: ["$store"],
 	data() {
 		return {
-			chartMinDate: dayjs().subtract(Math.max(this.$store.state.timePeriod, 1), "minutes").format(),
-			chartMaxDate: dayjs().format(),
+			chartMinDate: null,
+			chartMaxDate: null
 		}
+	},
+	mounted() {
+		this.updateChartDateRange()
 	},
 	methods: {
 		convertCelsiusToSelectedUnit(temp) {
@@ -109,6 +112,14 @@ export default {
 		formatRelativeDate(date) {
 			return dayjs().to(dayjs(date));
 		},
+		updateChartDateRange() {
+			let referenceDate = dayjs(/*this.sensorEntries[this.sensorEntries.length - 1]?.createdAt ||*/ new Date());
+
+			this.chartMinDate = referenceDate.subtract(Math.max(this.$store.state.timePeriod, 1), "minutes").format();
+			this.chartMaxDate = referenceDate.format();
+
+			this.$refs.chart.update();
+		}
 	},
 	computed: {
 		chartOptions() {
@@ -227,14 +238,10 @@ export default {
 	},
 	watch: {
 		sensorEntries(value) {
-			this.chartMinDate = dayjs().subtract(Math.max(this.$store.state.timePeriod, 1), "minutes").format();
-			this.chartMaxDate = dayjs().format();
-
-			this.$refs.chart.update();
+			this.updateChartDateRange();
 		},
 		"$store.state.timePeriod"(value) {
-			this.chartMinDate = dayjs().subtract(Math.max(value, 1), "minutes").format();
-			this.chartMaxDate = dayjs().format();
+			this.updateChartDateRange();
 		}
 	}
 }
