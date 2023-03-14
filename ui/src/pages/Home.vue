@@ -37,7 +37,7 @@ export default {
 			this.updateInterval = setInterval(async () => {
 				this.nodes = await fetch(`http://${serverUrl}/api/v1/nodes`).then(data => data.json());
 				this.sensorEntries = await fetch(`http://${serverUrl}/api/v1/sensors`).then(data => data.json());
-			}, 10 * 1000);
+			}, 5 * 1000);
 		} catch (error) {
 			alert(`Failed to connect to http://${serverUrl}`);
 		}
